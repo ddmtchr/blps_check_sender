@@ -23,7 +23,7 @@ public class PdfEmailService {
     private final JavaMailSender mailSender;
 
     public void sendPdf(CheckDto checkDto, OneCCheckOutputRecord oneCCheck) throws MessagingException, IOException {
-        final Path path = Path.of("/Users/mikhail.rubin/Desktop/blps_check_sender/src/main/resources/test.jpg");
+        final Path path = Path.of("src/main/resources/test.jpg");
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
