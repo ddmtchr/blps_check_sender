@@ -51,7 +51,7 @@ public class OneCInteraction implements Interaction {
                 .retrieve()
                 .body(byte[].class);
 
-        output = new OneCCheckOutputRecord(pdfResponse);
+        output = new OneCCheckOutputRecord(checkIdResponse.getId(), pdfResponse);
         return true;
     }
 
@@ -78,7 +78,7 @@ public class OneCInteraction implements Interaction {
                 .retrieve()
                 .body(byte[].class);
 
-        return new OneCCheckOutputRecord(pdfResponse);
+        return new OneCCheckOutputRecord(checkIdResponse.getId(), pdfResponse);
     }
 
     @Override

@@ -2,31 +2,32 @@ package com.ddmtchr.blps_check_sender.connector;
 
 import jakarta.resource.ResourceException;
 import jakarta.resource.cci.*;
+import jakarta.resource.spi.ManagedConnectionFactory;
 
 import javax.naming.NamingException;
 import javax.naming.Reference;
 
 public class OneCConnectionFactory implements ConnectionFactory {
 
-    private final String url;
+    private final ManagedConnectionFactory managedConnectionFactory;
 
-    public OneCConnectionFactory(String url) {
-        this.url = url;
+    public OneCConnectionFactory(ManagedConnectionFactory managedConnectionFactory) {
+        this.managedConnectionFactory = managedConnectionFactory;
     }
 
     @Override
     public Connection getConnection() throws ResourceException {
-        return new OneCConnection(url);
+        return (OneCConnection) this.managedConnectionFactory.createManagedConnection(null, null).getConnection(null, null);
     }
 
     @Override
     public Connection getConnection(ConnectionSpec properties) throws ResourceException {
-        return new OneCConnection(url);
+        return getConnectionFromSpec(properties);
     }
 
     private Connection getConnectionFromSpec(ConnectionSpec spec) throws ResourceException {
-        if (spec instanceof OneCConnectionSpec) {
-            return new OneCConnection(((OneCConnectionSpec) spec).getUrl());
+        if (spec instanceof OneCConnectionSpec oneCConnectionSpec) {
+            return new OneCConnection(oneCConnectionSpec.getUrl());
         }
         throw new ResourceException("ConnectionSpec isn't instance of OneCConnectionSpec");
     }

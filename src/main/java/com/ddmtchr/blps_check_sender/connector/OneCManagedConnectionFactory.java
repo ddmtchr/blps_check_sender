@@ -4,7 +4,6 @@ import jakarta.resource.ResourceException;
 import jakarta.resource.cci.Connection;
 import jakarta.resource.cci.ConnectionFactory;
 import jakarta.resource.spi.*;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.security.auth.Subject;
 import java.io.PrintWriter;
@@ -18,24 +17,24 @@ import java.util.Set;
 )
 public class OneCManagedConnectionFactory implements ManagedConnectionFactory, ResourceAdapterAssociation {
 
-    @Value("${onec.url}")
-    private String url;
+    private final String url;
     private PrintWriter logWriter;
     private ResourceAdapter ra;
     private boolean isResourceAdapterSet;
 
-    public OneCManagedConnectionFactory() {
+    public OneCManagedConnectionFactory(String url) {
+        this.url = url;
         this.isResourceAdapterSet = false;
     }
 
     @Override
     public Object createConnectionFactory(ConnectionManager cxManager) throws ResourceException {
-        return new OneCConnectionFactory(url);
+        return new OneCConnectionFactory(this);
     }
 
     @Override
     public Object createConnectionFactory() throws ResourceException {
-        return new OneCConnectionFactory(url);
+        return new OneCConnectionFactory(this);
     }
 
     @Override

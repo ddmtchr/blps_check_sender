@@ -1,9 +1,11 @@
 package com.ddmtchr.blps_check_sender.consumer;
 
 import com.ddmtchr.blps_check_sender.dto.CheckDto;
+import com.ddmtchr.blps_check_sender.service.OneCService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.jms.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +14,10 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CheckMessageConsumer implements CommandLineRunner {
+
+    private final OneCService oneCService;
 
     @Value("${rabbitmq.url}")
     private String url;
@@ -43,7 +48,7 @@ public class CheckMessageConsumer implements CommandLineRunner {
                 if (message instanceof TextMessage textMessage) {
                     String json = textMessage.getText();
                     CheckDto dto = objectMapper.readValue(json, CheckDto.class);
-                    log.info("Received message: {}", dto);
+                    oneCService.processCheck(dto);
                 }
             } catch (JsonProcessingException e) {
                 log.error("Error processing JSON: {}", e.getMessage());
