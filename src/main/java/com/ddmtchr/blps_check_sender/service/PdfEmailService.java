@@ -11,6 +11,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -18,19 +22,19 @@ public class PdfEmailService {
 
     private final JavaMailSender mailSender;
 
-    public void sendPdf(CheckDto checkDto, OneCCheckOutputRecord oneCCheck) throws MessagingException {
+    public void sendPdf(CheckDto checkDto, OneCCheckOutputRecord oneCCheck) throws MessagingException, IOException {
+        final Path path = Path.of("/Users/mikhail.rubin/Desktop/blps_check_sender/src/main/resources/test.jpg");
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
         helper.setFrom("rmr04@yandex.ru");
         helper.setTo(checkDto.getEmail());
         helper.setSubject("Чек по аренде жилья");
+        helper.setText("Hello");
 
         try {
-            helper.addAttachment("receipt_" + oneCCheck.getId() + ".pdf", new ByteArrayResource(oneCCheck.getPdfBytes()));
+            helper.addAttachment("happy.jpg", new ByteArrayResource(Files.readAllBytes(path)));
             mailSender.send(message);
-
-            log.info("Email with check #{} sent", oneCCheck.getId());
 
         } catch (Exception e) {
             e.printStackTrace();
