@@ -5,11 +5,13 @@ import com.ddmtchr.blps_check_sender.dto.CheckDto;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PdfEmailService {
@@ -20,12 +22,19 @@ public class PdfEmailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        helper.setFrom("noreply@blps.se.ifmo.ru");
+        helper.setFrom("rmr04@yandex.ru");
         helper.setTo(checkDto.getEmail());
         helper.setSubject("Чек по аренде жилья");
 
-        helper.addAttachment("receipt_" + oneCCheck.getId() + ".pdf", new ByteArrayResource(oneCCheck.getPdfBytes()));
+        try {
+            helper.addAttachment("receipt_" + oneCCheck.getId() + ".pdf", new ByteArrayResource(oneCCheck.getPdfBytes()));
+            mailSender.send(message);
 
-        mailSender.send(message);
+            log.info("Email with check #{} sent", oneCCheck.getId());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

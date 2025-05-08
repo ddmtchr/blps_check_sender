@@ -3,12 +3,16 @@ package com.ddmtchr.blps_check_sender.connector;
 import com.ddmtchr.blps_check_sender.connector.record.OneCCheckIdRecord;
 import com.ddmtchr.blps_check_sender.connector.record.OneCCheckInputRecord;
 import com.ddmtchr.blps_check_sender.connector.record.OneCCheckOutputRecord;
+import com.ddmtchr.blps_check_sender.exception.OneCInteractionException;
 import jakarta.resource.ResourceException;
 import jakarta.resource.cci.Record;
 import jakarta.resource.cci.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 
+@Slf4j
 public class OneCInteraction implements Interaction {
 
     private final Connection connection;
@@ -66,17 +70,29 @@ public class OneCInteraction implements Interaction {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(input)
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                    log.error("Error {} during POST to 1C: {}", response.getStatusCode(), response.getStatusText());
+                    throw new OneCInteractionException("Error during POST to 1C");
+                }))
                 .body(OneCCheckIdRecord.class);
 
         if (checkIdResponse == null) {
             return null;
         }
 
+        log.info("Created check #{} in 1C", checkIdResponse.getId());
+
         byte[] pdfResponse = restClient
                 .get()
-                .uri("/" + checkIdResponse.getId())
+                .uri("?id={param}", checkIdResponse.getId())
                 .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
+                    log.error("Error {} during GET to 1C: {}", response.getStatusCode(), response.getStatusText());
+                    throw new OneCInteractionException("Error during GET to 1C");
+                }))
                 .body(byte[].class);
+
+        log.info("Retrieved check #{} from 1C", checkIdResponse.getId());
 
         return new OneCCheckOutputRecord(checkIdResponse.getId(), pdfResponse);
     }

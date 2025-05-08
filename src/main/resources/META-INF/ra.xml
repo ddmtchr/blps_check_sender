@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connector xmlns="https://jakarta.ee/xml/ns/jakartaee"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                               https://jakarta.ee/xml/ns/jakartaee/connector_2_1.xsd"
+           version="2.1">
+    <display-name>1C HTTP Connector</display-name>
+    <vendor-name>se.ifmo</vendor-name>
+    <eis-type>1C ERP</eis-type>
+    <resourceadapter-version>1.0</resourceadapter-version>
+
+    <resourceadapter>
+        <resourceadapter-class>com.ddmtchr.blps_check_sender.connector.OneCResourceAdapter</resourceadapter-class>
+
+        <outbound-resourceadapter>
+            <connection-definition>
+                <managedconnectionfactory-class>com.ddmtchr.blps_check_sender.connector.OneCManagedConnectionFactory</managedconnectionfactory-class>
+                <connectionfactory-interface>jakarta.resource.cci.ConnectionFactory</connectionfactory-interface>
+                <connectionfactory-impl-class>com.ddmtchr.blps_check_sender.connector.OneCConnectionFactory</connectionfactory-impl-class>
+                <connection-interface>jakarta.resource.cci.Connection</connection-interface>
+                <connection-impl-class>com.ddmtchr.blps_check_sender.connector.OneCConnection</connection-impl-class>
+            </connection-definition>
+            <transaction-support>NoTransaction</transaction-support>
+        </outbound-resourceadapter>
+    </resourceadapter>
+</connector>
